@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; 
 import axios from 'axios';
 import GrafoInterativo from './components/GrafoInterativo';
 import PainelMetricas from './components/PainelMetricas';
@@ -15,7 +16,7 @@ interface Node {
   [key: string]: any;
 }
 
-interface Link {
+interface LinkType {
   source: string | number;
   target: string | number;
   weight?: number;
@@ -24,13 +25,24 @@ interface Link {
 
 interface DadosGrafo {
   nodes: Node[];
-  links: Link[];
+  links: LinkType[];
 }
 
 interface ResultadoCaminho {
   caminho: string[];
   custo: number;
   tempo_ms: number;
+}
+
+function Home() {
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-full gap-6">
+      <h1 className="text-5xl font-bold text-center">Explorador de Grafos</h1>
+      <Link to="/grafo" className="px-6 py-3 bg-imdb text-black font-bold rounded text-lg hover:bg-yellow-500 transition">
+        Aceder ao Grafo
+      </Link>
+    </div>
+  );
 }
 
 export default function App() {
@@ -67,25 +79,44 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
-      <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800">
-        <div className="flex items-center gap-4">
-          <div className="bg-imdb text-black font-black text-2xl px-2 py-1 rounded">IMDb</div>
-          <h1 className="text-xl font-semibold">Análise de Redes</h1>
-        </div>
-      </header>
+    <Router>
+      <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
+        <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800">
+          <div className="flex items-center gap-4">
+            <div className="bg-imdb text-black font-black text-2xl px-2 py-1 rounded">IMDb</div>
+            <h1 className="text-xl font-semibold">Análise de Redes</h1>
+          </div>
+          <nav className="flex gap-6 font-semibold">
+            <Link to="/" className="hover:text-imdb transition">Início</Link>
+            <Link to="/grafo" className="hover:text-imdb transition">Grafo</Link>
+            <Link to="/avd" className="hover:text-imdb transition">AVD</Link>
+            <Link to="/filmes" className="hover:text-imdb transition">Filmes</Link>
+          </nav>
+        </header>
 
-      <main className="flex flex-1 overflow-hidden">
-        <div className="flex-1 p-4">
-          <GrafoInterativo dadosGrafo={dadosGrafo} caminho={resultado.caminho} />
-        </div>
-        <PainelMetricas 
-          metricas={metricas} 
-          nosDisponiveis={dadosGrafo.nodes}
-          onBuscar={handleBuscarCaminho}
-          resultado={resultado}
-        />
-      </main>
-    </div>
+        <main className="flex flex-1 overflow-hidden">
+          <Routes> 
+            <Route path="/" element={<Home />} />
+            
+            <Route path="/grafo" element={
+              <>
+                <div className="flex-1 p-4">
+                  <GrafoInterativo dadosGrafo={dadosGrafo} caminho={resultado.caminho} />
+                </div>
+                <PainelMetricas 
+                  metricas={metricas} 
+                  nosDisponiveis={dadosGrafo.nodes}
+                  onBuscar={handleBuscarCaminho}
+                  resultado={resultado}
+                />
+              </>
+            } />
+            
+            <Route path="/avd" element={<div className="flex flex-1 items-center justify-center text-2xl">Aba de AVD (Em breve)</div>} />
+            <Route path="/filmes" element={<div className="flex flex-1 items-center justify-center text-2xl">Aba de Filmes (Em breve)</div>} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }

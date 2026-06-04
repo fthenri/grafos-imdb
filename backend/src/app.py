@@ -21,7 +21,7 @@ def get_grafo():
         if u in nos_relevantes and v in nos_relevantes:
             edges.append({"source": u, "target": v, "weight": attrs.get("peso", 1)})
 
-    return jsonify({"nodes": nodes, "edges": edges})
+    return jsonify({"nodes": nodes, "links": edges})
 
 @app.route('/api/metricas', methods=['GET'])
 def get_metricas():
