@@ -1,4 +1,14 @@
-export default function PainelMetricas({ metricas }) {
+interface Metricas {
+  ordem: number;
+  tamanho: number;
+  densidade: number;
+}
+
+interface PainelMetricasProps {
+  metricas: Metricas;
+}
+
+export default function PainelMetricas({ metricas }: PainelMetricasProps) {
   return (
     <div className="w-80 bg-darkcard p-4 flex flex-col gap-4 border-l border-gray-800 h-full overflow-y-auto">
       <h2 className="text-xl font-bold text-imdb">Métricas Globais</h2>

@@ -2,9 +2,33 @@ import { useState } from 'react';
 import GrafoInterativo from './components/GrafoInterativo';
 import PainelMetricas from './components/PainelMetricas';
 
+interface Metricas {
+  ordem: number;
+  tamanho: number;
+  densidade: number;
+}
+
+interface Node {
+  id: string | number;
+  label?: string;
+  [key: string]: any;
+}
+
+interface Link {
+  source: string | number;
+  target: string | number;
+  weight?: number;
+  [key: string]: any;
+}
+
+interface DadosGrafo {
+  nodes: Node[];
+  links: Link[];
+}
+
 export default function App() {
-  const [metricas, setMetricas] = useState({ ordem: 0, tamanho: 0, densidade: 0 });
-  const [dadosGrafo, setDadosGrafo] = useState({ nodes: [], links: [] });
+  const [metricas, setMetricas] = useState<Metricas>({ ordem: 0, tamanho: 0, densidade: 0 });
+  const [dadosGrafo, setDadosGrafo] = useState<DadosGrafo>({ nodes: [], links: [] });
 
   return (
     <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
