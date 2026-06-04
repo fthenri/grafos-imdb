@@ -84,7 +84,6 @@ export default function App() {
         <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800 h-16 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="bg-imdb text-black font-black text-2xl px-2 py-1 rounded">IMDb</div>
-            <h1 className="text-xl font-semibold">Análise de Redes</h1>
           </div>
           <nav className="flex gap-6 font-semibold">
             <Link to="/" className="hover:text-imdb transition">Início</Link>

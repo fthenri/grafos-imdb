@@ -44,8 +44,8 @@ export default function GrafoInterativo({ dadosGrafo, caminho }: GrafoInterativo
   const neighbors = useMemo(() => {
     const map = new Map();
     dadosGrafo.links.forEach(link => {
-      const source = typeof link.source === 'object' ? link.source.id : link.source;
-      const target = typeof link.target === 'object' ? link.target.id : link.target;
+      const source = String(typeof link.source === 'object' ? link.source.id : link.source); 
+      const target = String(typeof link.target === 'object' ? link.target.id : link.target); 
       if (!map.has(source)) map.set(source, new Set());
       if (!map.has(target)) map.set(target, new Set());
       map.get(source).add(target);
@@ -61,34 +61,38 @@ export default function GrafoInterativo({ dadosGrafo, caminho }: GrafoInterativo
         height={dimensions.height}
         graphData={dadosGrafo}
         nodeLabel="label"
+        nodeVal={(node: any) => node.val || 1.5} 
         enableNodeDrag={false}
         onNodeClick={(node) => setSelectedNode(node === selectedNode ? null : node)}
         nodeColor={(node) => {
-          if (caminho.includes(String(node.id))) return '#ff0000';
+          const nodeId = String(node.id); 
+          if (caminho.includes(nodeId)) return '#ff0000';
           
           if (selectedNode) {
-            const isNeighbor = neighbors.get(selectedNode.id)?.has(node.id);
-            return node.id === selectedNode.id || isNeighbor ? '#f5c518' : 'rgba(245, 197, 24, 0.2)';
+            const selectedId = String(selectedNode.id); 
+            const isNeighbor = neighbors.get(selectedId)?.has(nodeId);
+            return nodeId === selectedId || isNeighbor ? '#f5c518' : 'rgba(245, 197, 24, 0.2)';
           }
           return '#f5c518';
         }}
         linkColor={(link) => {
-          const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-          const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-          const noCaminho = caminho.includes(String(sourceId)) && caminho.includes(String(targetId));
+          const sourceId = String(typeof link.source === 'object' ? link.source.id : link.source); 
+          const targetId = String(typeof link.target === 'object' ? link.target.id : link.target); 
+          const noCaminho = caminho.includes(sourceId) && caminho.includes(targetId);
           
           if (noCaminho) return '#ff0000';
 
           if (selectedNode) {
-            const isConnected = sourceId === selectedNode.id || targetId === selectedNode.id;
+            const selectedId = String(selectedNode.id); 
+            const isConnected = sourceId === selectedId || targetId === selectedId;
             return isConnected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(51, 51, 51, 0.1)';
           }
           return '#333333';
         }}
         linkWidth={(link) => {
-          const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-          const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-          return caminho.includes(String(sourceId)) && caminho.includes(String(targetId)) ? 3 : 1;
+          const sourceId = String(typeof link.source === 'object' ? link.source.id : link.source);
+          const targetId = String(typeof link.target === 'object' ? link.target.id : link.target);
+          return caminho.includes(sourceId) && caminho.includes(targetId) ? 3 : 1;
         }}
         backgroundColor="#000000"
       />
