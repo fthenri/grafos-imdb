@@ -34,7 +34,6 @@ def criar_cenarios_bellman_ford():
     return g_sem_ciclo, g_com_ciclo
 
 def extrair_amostra_conectada(graph, max_nos=800):
-    """Extrai um subgrafo conectado via BFS a partir de um nó aleatório."""
     import random
     from collections import deque
 

@@ -2,15 +2,6 @@ from collections import deque
 import heapq
 
 def bfs(graph, start):
-    """
-    Busca em largura - Breadth-First Search.
-
-    Percorre o grafo em camadas, visitando primeiro os vizinhos
-    mais próximos do nó inicial.
-
-    Retorna a ordem de visita dos nós.
-    """
-
     if not graph.has_node(start):
         raise ValueError(f"Nó inicial não encontrado no grafo: {start}")
 
@@ -34,20 +25,6 @@ def bfs(graph, start):
 
 
 def bfs_layers(graph, start):
-    """
-    BFS por camadas.
-
-    Retorna um dicionário indicando a distância em número de arestas
-    entre o nó inicial e cada nó alcançado.
-
-    Exemplo:
-    {
-        "REC": 0,
-        "SSA": 1,
-        "GRU": 1,
-        "POA": 2
-    }
-    """
 
     if not graph.has_node(start):
         raise ValueError(f"Nó inicial não encontrado no grafo: {start}")
@@ -69,14 +46,6 @@ def bfs_layers(graph, start):
 
 
 def dfs(graph, start):
-    """
-    Busca em profundidade - Depth-First Search.
-
-    Percorre o grafo avançando o máximo possível por um caminho
-    antes de retornar e explorar outros vizinhos.
-
-    Retorna a ordem de visita dos nós.
-    """
 
     if not graph.has_node(start):
         raise ValueError(f"Nó inicial não encontrado no grafo: {start}")
@@ -98,11 +67,6 @@ def dfs(graph, start):
 
 
 def connected_components(graph):
-    """
-    Retorna as componentes conexas do grafo.
-
-    Em um grafo conectado, haverá apenas uma componente contendo todos os nós.
-    """
 
     visited = set()
     components = []
@@ -126,13 +90,6 @@ def connected_components(graph):
 
 
 def is_connected(graph):
-    """
-    Verifica se o grafo é conectado.
-
-    Um grafo é conectado quando todos os nós podem ser alcançados
-    a partir de qualquer nó inicial.
-    """
-
     nodes = graph.nodes()
 
     if not nodes:
@@ -144,22 +101,6 @@ def is_connected(graph):
     return len(visited) == len(nodes)
 
 def reconstruct_path(predecessors, origem, destino):
-    """
-    Reconstrói o caminho mínimo a partir do dicionário de predecessores.
-
-    Exemplo:
-    predecessors = {
-        "POA": "GRU",
-        "GRU": "REC"
-    }
-
-    origem = "REC"
-    destino = "POA"
-
-    Retorno:
-    ["REC", "GRU", "POA"]
-    """
-
     path = []
     current = destino
 
@@ -180,21 +121,6 @@ def reconstruct_path(predecessors, origem, destino):
 
 
 def dijkstra(graph, origem, destino):
-    """
-    Algoritmo de Dijkstra.
-
-    Calcula o caminho de menor custo entre origem e destino
-    em um grafo com pesos não negativos.
-
-    Retorna:
-    {
-        "origem": "REC",
-        "destino": "POA",
-        "custo": 4.0,
-        "caminho": ["REC", "GRU", "POA"]
-    }
-    """
-
     if not graph.has_node(origem):
         raise ValueError(f"Origem não encontrada no grafo: {origem}")
 
@@ -241,21 +167,6 @@ def dijkstra(graph, origem, destino):
 
 
 def bellman_ford(graph, origem):
-    """
-    Algoritmo de Bellman-Ford.
-
-    Calcula as menores distâncias a partir de uma origem.
-    Diferentemente do Dijkstra, aceita pesos negativos.
-
-    Também detecta ciclos negativos.
-
-    Retorna:
-    {
-        "distancias": {...},
-        "predecessores": {...}
-    }
-    """
-
     if not graph.has_node(origem):
         raise ValueError(f"Origem não encontrada no grafo: {origem}")
 
@@ -267,7 +178,6 @@ def bellman_ford(graph, origem):
 
     distances[origem] = 0
 
-    # Relaxamento das arestas |V| - 1 vezes
     for _ in range(len(nodes) - 1):
         updated = False
 
@@ -279,8 +189,6 @@ def bellman_ford(graph, origem):
                 predecessors[v] = u
                 updated = True
 
-            # Se o grafo for não direcionado, é necessário relaxar o sentido inverso.
-            # Em graph.edges(), a aresta aparece uma única vez.
             if not graph.directed:
                 if distances[v] != float("inf") and distances[v] + peso < distances[u]:
                     distances[u] = distances[v] + peso
@@ -290,7 +198,6 @@ def bellman_ford(graph, origem):
         if not updated:
             break
 
-    # Verificação de ciclo negativo
     for u, v, attrs in edges:
         peso = attrs["peso"]
 
@@ -308,10 +215,6 @@ def bellman_ford(graph, origem):
 
 
 def bellman_ford_path(graph, origem, destino):
-    """
-    Calcula o caminho mínimo entre origem e destino usando Bellman-Ford.
-    """
-
     resultado = bellman_ford(graph, origem)
 
     distancias = resultado["distancias"]

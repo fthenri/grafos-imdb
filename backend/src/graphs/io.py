@@ -1,26 +1,32 @@
 import pandas as pd
-import ast
 import json
+import ast
+from collections import defaultdict
+from src.graphs.graph import Graph
 
-def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5):
-    from src.graphs.graph import Graph
-    import pandas as pd
-    import json
-    import ast
+def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
 
     df = pd.read_csv(path_tmdb)
 
-    if 'title' not in df.columns or 'cast' not in df.columns:
-        raise ValueError("O dataset do TMDB precisa conter as colunas 'title' e 'cast'.")
+    if 'title' not in df.columns or 'cast' not in df.columns or 'movie_id' not in df.columns:
+        raise ValueError("O dataset precisa conter as colunas 'movie_id', 'title' e 'cast'.")
 
     graph = Graph(directed=False)
-    edges_added = 0
 
+    actor_movies = defaultdict(list)
+    
+    movie_titles = {}
+
+    print("Lendo CSV e mapeando nós...")
     for index, row in df.iterrows():
-        if edges_added >= max_edges:
-            break
-
+        movie_id = row['movie_id']
+        title = row['title']
         cast_str = str(row['cast'])
+
+        movie_id_str = str(movie_id)
+        graph.add_node(movie_id_str, title=title, tipo="filme")
+        movie_titles[movie_id_str] = title
+
         if cast_str == "nan" or not cast_str.strip():
             continue
 
@@ -35,37 +41,35 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5)
         if not isinstance(cast_data, list):
             continue
 
-        atores_filme = []
         for actor in cast_data:
             if isinstance(actor, dict) and 'name' in actor:
                 actor_name = str(actor['name']).strip()
                 if actor_name:
-                    if actor_name not in atores_filme:
-                        atores_filme.append(actor_name)
-            if len(atores_filme) == top_cast:
-                break
+                    actor_movies[actor_name].append(movie_id_str)
 
-        for ator in atores_filme:
-            graph.add_node(ator, tipo="ator", nome=ator)
+    print("Calculando interseções e construindo arestas...")
+    movie_pair_counts = defaultdict(lambda: defaultdict(int))
 
-        for i in range(len(atores_filme)):
-            for j in range(i + 1, len(atores_filme)):
-                ator_u = atores_filme[i]
-                ator_v = atores_filme[j]
+    for actor, movies in actor_movies.items():
+        for i in range(len(movies)):
+            for j in range(i + 1, len(movies)):
+                m1, m2 = movies[i], movies[j]
+                if m1 != m2:
+                    u, v = min(m1, m2), max(m1, m2)
+                    movie_pair_counts[u][v] += 1
 
-                if ator_u == ator_v:
-                    continue
+    edges_added = 0
+    for u, neighbors in movie_pair_counts.items():
+        for v, shared_actors in neighbors.items():
+            if shared_actors >= threshold:
+                peso = round(1.0 / shared_actors, 4)
+                graph.add_edge(
+                    u, v, 
+                    peso=peso, 
+                    atores_em_comum=shared_actors, 
+                    tipo_conexao="elenco_compartilhado"
+                )
+                edges_added += 1
 
-                if graph.has_edge(ator_u, ator_v):
-                    peso_atual = graph.get_edge_attrs(ator_u, ator_v)["peso"]
-                    graph.add_edge(ator_u, ator_v, peso=peso_atual + 1.0, tipo_conexao="colaboracao")
-                else:
-                    graph.add_edge(ator_u, ator_v, peso=1.0, tipo_conexao="colaboracao")
-                    edges_added += 1
-
-                if edges_added >= max_edges:
-                    break
-            if edges_added >= max_edges:
-                break
-
+    print(f"Grafo construído com sucesso: {graph.order()} nós e {graph.size()} arestas.")
     return graph

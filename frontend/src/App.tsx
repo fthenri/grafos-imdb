@@ -1,0 +1,29 @@
+import { useState } from 'react';
+import GrafoInterativo from './components/GrafoInterativo';
+import PainelMetricas from './components/PainelMetricas';
+
+export default function App() {
+  const [metricas, setMetricas] = useState({ ordem: 0, tamanho: 0, densidade: 0 });
+  const [dadosGrafo, setDadosGrafo] = useState({ nodes: [], links: [] });
+
+  return (
+    <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
+      <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800">
+        <div className="flex items-center gap-4">
+          <div className="bg-imdb text-black font-black text-2xl px-2 py-1 rounded">IMDb</div>
+          <h1 className="text-xl font-semibold">Análise de Redes</h1>
+        </div>
+        <div className="flex gap-2">
+           <input type="text" placeholder="Buscar filme..." className="bg-black border border-gray-700 rounded px-3 py-1 focus:outline-none focus:border-imdb" />
+        </div>
+      </header>
+
+      <main className="flex flex-1 overflow-hidden">
+        <div className="flex-1 p-4">
+          <GrafoInterativo dadosGrafo={dadosGrafo} />
+        </div>
+        <PainelMetricas metricas={metricas} />
+      </main>
+    </div>
+  );
+}
