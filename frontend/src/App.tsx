@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios'; 
 import GrafoInterativo from './components/GrafoInterativo';
 import PainelMetricas from './components/PainelMetricas';
 
@@ -29,6 +30,22 @@ interface DadosGrafo {
 export default function App() {
   const [metricas, setMetricas] = useState<Metricas>({ ordem: 0, tamanho: 0, densidade: 0 });
   const [dadosGrafo, setDadosGrafo] = useState<DadosGrafo>({ nodes: [], links: [] });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [resMetricas, resGrafo] = await Promise.all([
+          axios.get('http://127.0.0.1:5000/api/metricas'),
+          axios.get('http://127.0.0.1:5000/api/grafo')
+        ]);
+        setMetricas(resMetricas.data);
+        setDadosGrafo(resGrafo.data);
+      } catch (error) {
+        console.error("Erro ao buscar dados do Flask:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
