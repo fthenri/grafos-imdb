@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'; 
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import GrafoInterativo from './components/GrafoInterativo';
 import PainelMetricas from './components/PainelMetricas';
@@ -17,8 +17,8 @@ interface Node {
 }
 
 interface LinkType {
-  source: string | number;
-  target: string | number;
+  source: string | number | any;
+  target: string | number | any;
   weight?: number;
   [key: string]: any;
 }
@@ -80,8 +80,8 @@ export default function App() {
 
   return (
     <Router>
-      <div className="flex flex-col h-screen bg-darkbg text-white font-sans">
-        <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800">
+      <div className="flex flex-col h-screen bg-darkbg text-white font-sans overflow-hidden">
+        <header className="flex items-center justify-between p-4 bg-darkcard border-b border-gray-800 h-16 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="bg-imdb text-black font-black text-2xl px-2 py-1 rounded">IMDb</div>
             <h1 className="text-xl font-semibold">Análise de Redes</h1>
@@ -94,21 +94,21 @@ export default function App() {
           </nav>
         </header>
 
-        <main className="flex flex-1 overflow-hidden">
-          <Routes> 
+        <main className="flex flex-1 overflow-hidden w-full h-[calc(100vh-4rem)]">
+          <Routes>
             <Route path="/" element={<Home />} />
             
             <Route path="/grafo" element={
               <>
-                <div className="flex-1 p-4">
-                  <GrafoInterativo dadosGrafo={dadosGrafo} caminho={resultado.caminho} />
-                </div>
                 <PainelMetricas 
                   metricas={metricas} 
                   nosDisponiveis={dadosGrafo.nodes}
                   onBuscar={handleBuscarCaminho}
                   resultado={resultado}
                 />
+                <div className="flex-1 h-full relative overflow-hidden p-4">
+                  <GrafoInterativo dadosGrafo={dadosGrafo} caminho={resultado.caminho} />
+                </div>
               </>
             } />
             
