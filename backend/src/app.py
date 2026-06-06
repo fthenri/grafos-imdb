@@ -3,7 +3,7 @@ from flask_cors import CORS
 import time
 
 from src.graphs.io import build_tmdb_graph 
-from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford_path  # Alterado para importar bellman_ford_path
+from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford_path  
 
 app = Flask(__name__)
 CORS(app)
@@ -12,8 +12,8 @@ grafo = build_tmdb_graph("data/tmdb_5000_credits.csv", threshold=2)
 
 @app.route('/api/grafo', methods=['GET'])
 def get_grafo():
-    # Alterado o limite de 50 para 500 nós para exibir uma parte maior do grafo no frontend
-    nos_relevantes = sorted(grafo.nodes(), key=lambda n: grafo.degree(n), reverse=True)[:500] 
+    # carregar todos os nós
+    nos_relevantes = sorted(grafo.nodes(), key=lambda n: grafo.degree(n), reverse=True)[:5000] 
     
     nodes = [{"id": n, "label": grafo.get_node_attrs(n).get("title", n)} for n in nos_relevantes]
     edges = []
@@ -46,14 +46,14 @@ def calcular_caminho():
     caminho, custo = [], 0
 
     if algoritmo == "bfs":
-        caminho = bfs(grafo, origem)  # Alterado para passar apenas o parâmetro esperado
+        caminho = bfs(grafo, origem)  
     elif algoritmo == "dfs":
-        caminho = dfs(grafo, origem)  # Alterado para passar apenas o parâmetro esperado
+        caminho = dfs(grafo, origem)  
     elif algoritmo == "dijkstra":
-        resultado = dijkstra(grafo, origem, destino)  # Alterado para extrair do dicionário de retorno
+        resultado = dijkstra(grafo, origem, destino)  
         caminho, custo = resultado["caminho"], resultado["custo"]
     elif algoritmo == "bellman-ford":
-        resultado = bellman_ford_path(grafo, origem, destino)  # Alterado para usar a função de caminho correta
+        resultado = bellman_ford_path(grafo, origem, destino)  
         caminho, custo = resultado["caminho"], resultado["custo"]
     else:
         return jsonify({"error": "Algoritmo não suportado"}), 400
