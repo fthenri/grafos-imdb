@@ -4,7 +4,9 @@ import ast
 from collections import defaultdict
 from src.graphs.graph import Graph
 
-def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
+TOP_K = 10  # peso max
+
+def build_tmdb_graph(path_tmdb: str, threshold: int = 1):  # peso min
 
     df = pd.read_csv(path_tmdb)
 
@@ -41,7 +43,7 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
         if not isinstance(cast_data, list):
             continue
 
-        for actor in cast_data:
+        for actor in cast_data[:TOP_K]:  
             if isinstance(actor, dict) and 'name' in actor:
                 actor_name = str(actor['name']).strip()
                 if actor_name:
@@ -62,7 +64,7 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
     for u, neighbors in movie_pair_counts.items():
         for v, shared_actors in neighbors.items():
             if shared_actors >= threshold:
-                peso = round(1.0 / shared_actors, 4)
+                peso = shared_actors  
                 graph.add_edge(
                     u, v, 
                     peso=peso, 
