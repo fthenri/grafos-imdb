@@ -72,7 +72,7 @@ def run_parte2(csv_path: str, max_edges: int = 100000):
         "bellman_ford": {}
     }
 
-    t_build, graph = measure_time(build_tmdb_graph, csv_path, max_edges)
+    t_build, graph = measure_time(build_tmdb_graph, csv_path, threshold=1, max_edges=200000)
 
     atores = graph.nodes()
 
