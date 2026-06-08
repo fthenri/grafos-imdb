@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import time
 
 from src.graphs.io import build_tmdb_graph 
 from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford_path  
