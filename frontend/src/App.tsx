@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import GrafoInterativo from './components/GrafoInterativo';
 import PainelMetricas from './components/PainelMetricas';
+import AVDDashboard from './components/AVDDashboard';
 
 interface Metricas {
   ordem: number;
@@ -111,7 +112,7 @@ export default function App() {
               </>
             } />
             
-            <Route path="/avd" element={<div className="flex flex-1 items-center justify-center text-2xl">Aba de AVD (Em breve)</div>} />
+            <Route path="/avd" element={<AVDDashboard />} />
             <Route path="/filmes" element={<div className="flex flex-1 items-center justify-center text-2xl">Aba de Filmes (Em breve)</div>} />
           </Routes>
         </main>

@@ -1,0 +1,92 @@
+{
+    "dataset_info": {
+        "ordem": 4803,
+        "tamanho": 149537,
+        "tempo_construcao_ms": 3951.22,
+        "total_atores": 4803
+    },
+    "bfs": [
+        {
+            "fonte": "11560",
+            "tempo_ms": 19.02,
+            "nos_alcancados": 4590,
+            "camada_maxima": 6
+        },
+        {
+            "fonte": "103731",
+            "tempo_ms": 18.71,
+            "nos_alcancados": 4590,
+            "camada_maxima": 6
+        },
+        {
+            "fonte": "81390",
+            "tempo_ms": 20.53,
+            "nos_alcancados": 4590,
+            "camada_maxima": 7
+        }
+    ],
+    "dfs": [
+        {
+            "fonte": "11560",
+            "tempo_ms": 21.08,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "103731",
+            "tempo_ms": 20.4,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "81390",
+            "tempo_ms": 20.49,
+            "nos_visitados": 4590
+        }
+    ],
+    "dijkstra": [
+        {
+            "origem": "55301",
+            "destino": "310",
+            "tempo_ms": 43.63,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "107",
+            "destino": "11661",
+            "tempo_ms": 16.69,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "18079",
+            "destino": "96399",
+            "tempo_ms": 83.64,
+            "custo": 7.0,
+            "tamanho_caminho": 7
+        },
+        {
+            "origem": "13785",
+            "destino": "33542",
+            "tempo_ms": 98.58,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "10306",
+            "destino": "46261",
+            "tempo_ms": 84.2,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        }
+    ],
+    "bellman_ford": {
+        "cenario_sem_ciclo": {
+            "tempo_ms": 0.03,
+            "status": "Sucesso",
+            "distancia_final": -3.0
+        },
+        "cenario_com_ciclo_negativo": {
+            "status": "Ciclo negativo detectado com sucesso"
+        }
+    }
+}

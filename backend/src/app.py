@@ -1,6 +1,7 @@
+import json
+from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import time
 
 from src.graphs.io import build_tmdb_graph 
 from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford_path  
@@ -65,6 +66,25 @@ def calcular_caminho():
         "custo": custo,
         "tempo_ms": round(tempo_ms, 2)
     })
+
+@app.route('/api/report', methods=['GET'])
+def get_report():
+    OUT_DIR = Path(__file__).resolve().parent.parent / "out"
+    caminho_report = OUT_DIR / "parte2_report.json"
+    
+    if not caminho_report.exists():
+        return jsonify({
+            "details": f"Arquivo parte2_report.json não encontrado em {caminho_report}. Execute 'py -m src.solve' no terminal do backend para gerá-lo."
+        }), 404
+        
+    try:
+        with open(caminho_report, "r", encoding="utf-8") as f:
+            dados = json.load(f)
+        return jsonify(dados)
+    except Exception as e:
+        return jsonify({
+            "details": f"Erro interno ao ler o arquivo JSON: {str(e)}"
+        }), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

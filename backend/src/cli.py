@@ -59,7 +59,6 @@ def main():
                 print(f"Erro: Destino '{args.destino}' não encontrado.")
                 sys.exit(1)
 
-    # Dicionário para guardar a resposta que será salva no JSON
     dados_saida = {
         "algoritmo": algoritmo_escolhido.upper(),
         "origem": origem_id,
