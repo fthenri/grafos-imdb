@@ -4,7 +4,7 @@ import ForceGraph2D from 'react-force-graph-2d';
 interface Node {
   id: string | number;
   label?: string;
-  val?: number; // Tamanho do nó
+  val?: number;
   [key: string]: any;
 }
 
@@ -29,7 +29,6 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
-  // 1. OBSERVER DE RESIZE (Corrige o bug das hitboxes mantendo o canvas perfeito)
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -46,7 +45,6 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
     return () => resizeObserver.disconnect();
   }, []);
 
-  // 2. MAPEAMENTO DE VIZINHOS (Da sua estética antiga para realçar conexões)
   const neighbors = useMemo(() => {
     const map = new Map();
     dadosGrafo.links.forEach(link => {
@@ -60,24 +58,7 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
     return map;
   }, [dadosGrafo]);
 
-  // 3. UTILITÁRIOS PARA O CAMINHO
-  const nodesNoCaminho = useMemo(() => new Set(caminho), [caminho]);
-
-  const isLinkInPath = (link: any) => {
-    if (caminho.length < 2) return false;
-    const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-    const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-    
-    for (let i = 0; i < caminho.length - 1; i++) {
-      if (
-        (String(caminho[i]) === String(sourceId) && String(caminho[i + 1]) === String(targetId)) ||
-        (String(caminho[i]) === String(targetId) && String(caminho[i + 1]) === String(sourceId))
-      ) {
-        return true;
-      }
-    }
-    return false;
-  };
+  const nodesVisitados = useMemo(() => new Set(caminho.map(String)), [caminho]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-black rounded-lg overflow-hidden border border-gray-800">
@@ -85,52 +66,51 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
         ref={fgRef}
         width={dimensions.width}
         height={dimensions.height}
-        // Passamos os dados crus, deixando a biblioteca calcular a FÍSICA do zero
         graphData={dadosGrafo} 
         
-        enableNodeDrag={true} // Pode arrastar os nós de novo
+        enableNodeDrag={true}
         onNodeClick={(node) => setSelectedNode(node === selectedNode ? null : node)}
         
-        // --- ESTÉTICA DOS NÓS ---
         nodeLabel="label"
         nodeVal={(node: any) => node.val || 1.5}
         nodeColor={(node: any) => {
           const nodeId = String(node.id);
           
-          // Se o nó faz parte do caminho traçado pelo algoritmo (Dijkstra/BFS), fica VERMELHO
-          if (nodesNoCaminho.has(nodeId)) return '#ff0000';
-          
-          // Lógica de transparência ao selecionar um nó
           if (selectedNode) {
             const selectedId = String(selectedNode.id);
-            const isNeighbor = neighbors.get(selectedId)?.has(nodeId);
-            return nodeId === selectedId || isNeighbor ? '#f5c518' : 'rgba(245, 197, 24, 0.2)';
+            const isSelectedOrNeighbor = nodeId === selectedId || neighbors.get(selectedId)?.has(nodeId);
+            // Alteração: Nó selecionado e vizinhos ficam verdes com prioridade
+            if (isSelectedOrNeighbor) return '#00ff00';
+            return 'rgba(245, 197, 24, 0.2)';
           }
           
-          return '#f5c518'; // Cor padrão (Amarelo IMDb)
+          if (nodesVisitados.has(nodeId)) return '#ff0000';
+          
+          return '#f5c518';
         }}
         
-        // --- ESTÉTICA DAS ARESTAS ---
         linkColor={(link: any) => {
-          // Arestas do caminho ficam vermelhas
-          if (isLinkInPath(link)) return '#ff0000';
+          const sourceId = String(typeof link.source === 'object' ? link.source.id : link.source);
+          const targetId = String(typeof link.target === 'object' ? link.target.id : link.target);
           
-          // Lógica de realce ao selecionar o nó
           if (selectedNode) {
-            const sourceId = String(typeof link.source === 'object' ? link.source.id : link.source);
-            const targetId = String(typeof link.target === 'object' ? link.target.id : link.target);
             const selectedId = String(selectedNode.id);
             const isConnected = sourceId === selectedId || targetId === selectedId;
-            return isConnected ? 'rgba(255, 255, 255, 0.8)' : 'rgba(51, 51, 51, 0.1)';
+            // Alteração: Aresta conectada ao nó selecionado fica branca com prioridade
+            if (isConnected) return '#ffffff';
+            return 'rgba(51, 51, 51, 0.1)';
           }
           
-          return '#333333'; // Cinza escuro padrão
+          if (nodesVisitados.has(sourceId) && nodesVisitados.has(targetId)) return 'rgba(255, 0, 0, 0.6)';
+          
+          return '#333333';
         }}
-        linkWidth={(link: any) => isLinkInPath(link) ? 3 : 1}
-        
-        // --- ANIMAÇÃO DO CAMINHO (Bolhas passando pelas arestas) ---
-        linkDirectionalParticles={(link: any) => isLinkInPath(link) ? 4 : 0}
-        linkDirectionalParticleSpeed={0.005}
+        linkWidth={(link: any) => {
+          const sourceId = String(typeof link.source === 'object' ? link.source.id : link.source);
+          const targetId = String(typeof link.target === 'object' ? link.target.id : link.target);
+          
+          return (nodesVisitados.has(sourceId) && nodesVisitados.has(targetId)) ? 2 : 1;
+        }}
         
         backgroundColor="#000000"
       />
