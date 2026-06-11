@@ -79,7 +79,6 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
           if (selectedNode) {
             const selectedId = String(selectedNode.id);
             const isSelectedOrNeighbor = nodeId === selectedId || neighbors.get(selectedId)?.has(nodeId);
-            // Alteração: Nó selecionado e vizinhos ficam verdes com prioridade
             if (isSelectedOrNeighbor) return '#00ff00';
             return 'rgba(245, 197, 24, 0.2)';
           }
@@ -96,7 +95,6 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
           if (selectedNode) {
             const selectedId = String(selectedNode.id);
             const isConnected = sourceId === selectedId || targetId === selectedId;
-            // Alteração: Aresta conectada ao nó selecionado fica branca com prioridade
             if (isConnected) return '#ffffff';
             return 'rgba(51, 51, 51, 0.1)';
           }
@@ -115,7 +113,6 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
         backgroundColor="#000000"
       />
 
-      {/* --- ABA LATERAL DIREITA AO CLICAR EM UM NÓ --- */}
       {selectedNode && (
         <div className="absolute right-4 top-4 bottom-4 w-80 bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4 border border-gray-800 rounded-lg flex flex-col gap-4 z-10 shadow-2xl">
           <h2 className="text-2xl font-bold text-[#f5c518]">{selectedNode.label || 'Título Desconhecido'}</h2>
