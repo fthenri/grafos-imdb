@@ -51,6 +51,9 @@ export default function App() {
   const [dadosGrafo, setDadosGrafo] = useState<DadosGrafo>({ nodes: [], links: [] });
   const [resultado, setResultado] = useState<ResultadoCaminho>({ caminho: [], custo: 0, tempo_ms: 0 });
 
+  const [origem, setOrigem] = useState('');
+  const [destino, setDestino] = useState('');
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,10 +70,10 @@ export default function App() {
     fetchData();
   }, []);
 
-  const handleBuscarCaminho = async (origem: string, destino: string, algoritmo: string) => {
+  const handleBuscarCaminho = async (origemBusca: string, destinoBusca: string, algoritmo: string) => {
     try {
       const res = await axios.post('http://127.0.0.1:5000/api/caminho', {
-        origem, destino, algoritmo
+        origem: origemBusca, destino: destinoBusca, algoritmo
       });
       setResultado(res.data);
     } catch (error) {
@@ -105,9 +108,18 @@ export default function App() {
                   nosDisponiveis={dadosGrafo.nodes}
                   onBuscar={handleBuscarCaminho}
                   resultado={resultado}
+                  origem={origem} 
+                  setOrigem={setOrigem} 
+                  destino={destino} 
+                  setDestino={setDestino} 
                 />
                 <div className="flex-1 h-full relative overflow-hidden p-4">
-                  <GrafoInterativo dadosGrafo={dadosGrafo} caminho={resultado.caminho} />
+                  <GrafoInterativo 
+                    dadosGrafo={dadosGrafo} 
+                    caminho={resultado.caminho} 
+                    setOrigem={setOrigem} 
+                    setDestino={setDestino} 
+                  />
                 </div>
               </>
             } />

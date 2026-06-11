@@ -17,6 +17,10 @@ interface PainelMetricasProps {
   nosDisponiveis: any[];
   onBuscar: (origem: string, destino: string, algoritmo: string) => void;
   resultado: Resultado;
+  origem: string;
+  setOrigem: (val: string) => void;
+  destino: string;
+  setDestino: (val: string) => void;
 }
 
 const SearchableSelect = ({ options, value, onChange, placeholder }: { options: any[], value: string, onChange: (val: string) => void, placeholder: string }) => {
@@ -92,9 +96,16 @@ const SearchableSelect = ({ options, value, onChange, placeholder }: { options: 
   );
 };
 
-export default function PainelMetricas({ metricas, nosDisponiveis, onBuscar, resultado }: PainelMetricasProps) {
-  const [origem, setOrigem] = useState('');
-  const [destino, setDestino] = useState('');
+export default function PainelMetricas({ 
+  metricas, 
+  nosDisponiveis, 
+  onBuscar, 
+  resultado,
+  origem,
+  setOrigem,
+  destino,
+  setDestino
+}: PainelMetricasProps) {
   const [algoritmo, setAlgoritmo] = useState('bfs');
 
   return (

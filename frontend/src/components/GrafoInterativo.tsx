@@ -21,9 +21,16 @@ interface GrafoInterativoProps {
     links: LinkType[];
   };
   caminho?: string[];
+  setOrigem: (id: string) => void;
+  setDestino: (id: string) => void;
 }
 
-const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho = [] }) => {
+const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ 
+  dadosGrafo, 
+  caminho = [], 
+  setOrigem, 
+  setDestino 
+}) => {
   const fgRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -60,11 +67,14 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
 
   const nodesVisitados = useMemo(() => new Set(caminho.map(String)), [caminho]);
 
-  const ordemVisita = useMemo(() => { // Mapeia o índice exato de cada nó no caminho para calcular o gradiente de cor
+  const ordemVisita = useMemo(() => {
     const map = new Map();
     caminho.forEach((id, index) => map.set(String(id), index));
     return map;
   }, [caminho]);
+
+  const idInicio = caminho.length > 0 ? String(caminho[0]) : null;
+  const idFim = caminho.length > 0 ? String(caminho[caminho.length - 1]) : null;
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-black rounded-lg overflow-hidden border border-gray-800">
@@ -78,7 +88,13 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
         onNodeClick={(node) => setSelectedNode(node === selectedNode ? null : node)}
         
         nodeLabel="label"
-        nodeVal={(node: any) => node.val || 1.5}
+        
+        nodeVal={(node: any) => {
+          const nodeId = String(node.id);
+          if (nodeId === idInicio || nodeId === idFim) return 4.5; 
+          return node.val || 1.5;
+        }}
+        
         nodeColor={(node: any) => {
           const nodeId = String(node.id);
           
@@ -89,7 +105,15 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
             return 'rgba(245, 197, 24, 0.2)';
           }
           
-          if (nodesVisitados.has(nodeId)) return '#ff0000';
+          if (nodesVisitados.has(nodeId)) {
+            if (nodeId === idInicio) return 'hsl(0, 100%, 50%)'; 
+            if (nodeId === idFim) return 'hsl(240, 100%, 50%)'; 
+            
+            const idx = ordemVisita.get(nodeId) ?? 0;
+            const totalNos = Math.max(1, caminho.length - 1);
+            const hue = (idx / totalNos) * 240; 
+            return `hsl(${hue}, 100%, 50%)`;
+          }
           
           return '#f5c518';
         }}
@@ -106,12 +130,12 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
           }
           
           if (nodesVisitados.has(sourceId) && nodesVisitados.has(targetId)) {
-            const idxSource = ordemVisita.get(sourceId) ?? 0; // Identifica a ordem de visita da origem
-            const idxTarget = ordemVisita.get(targetId) ?? 0; // Identifica a ordem de visita do destino
-            const maxIdx = Math.max(idxSource, idxTarget); // Utiliza o nó descoberto por último para pautar a cor da aresta
+            const idxSource = ordemVisita.get(sourceId) ?? 0;
+            const idxTarget = ordemVisita.get(targetId) ?? 0;
+            const maxIdx = Math.max(idxSource, idxTarget);
             const totalNos = Math.max(1, caminho.length - 1);
-            const hue = (maxIdx / totalNos) * 240; // Interpola matiz HSL de Vermelho (0) a Azul (240)
-            return `hsla(${hue}, 100%, 50%, 0.6)`; // Retorna a cor gerada com opacidade de 0.6
+            const hue = (maxIdx / totalNos) * 240;
+            return `hsla(${hue}, 100%, 50%, 0.6)`;
           }
           
           return '#333333';
@@ -126,12 +150,40 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
         backgroundColor="#000000"
       />
 
+      {caminho.length > 0 && (
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 bg-opacity-90 backdrop-blur px-6 py-3 rounded-full border border-gray-700 flex items-center gap-4 z-10 shadow-lg pointer-events-none">
+          <span className="text-sm font-bold text-red-500 uppercase tracking-wider">Início</span>
+          <div 
+            className="w-48 h-3 rounded-full" 
+            style={{ 
+              background: 'linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%))' 
+            }}
+          ></div>
+          <span className="text-sm font-bold text-blue-500 uppercase tracking-wider">Fim</span>
+        </div>
+      )}
+
       {selectedNode && (
         <div className="absolute right-4 top-4 bottom-4 w-80 bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4 border border-gray-800 rounded-lg flex flex-col gap-4 z-10 shadow-2xl">
           <h2 className="text-2xl font-bold text-[#f5c518]">{selectedNode.label || 'Título Desconhecido'}</h2>
-          <p className="text-sm text-gray-400">ID: {selectedNode.id}</p>
+          <p className="text-sm text-gray-400 mb-2">ID: {selectedNode.id}</p>
           
-          <div className="flex-1">
+          <div className="flex gap-2 w-full border-b border-gray-700 pb-4">
+            <button
+              onClick={() => setOrigem(String(selectedNode.id))}
+              className="flex-1 px-2 py-2 bg-red-600 bg-opacity-20 text-red-500 hover:bg-opacity-40 border border-red-800 rounded text-xs font-bold transition-all"
+            >
+              Definir Origem
+            </button>
+            <button
+              onClick={() => setDestino(String(selectedNode.id))}
+              className="flex-1 px-2 py-2 bg-blue-600 bg-opacity-20 text-blue-500 hover:bg-opacity-40 border border-blue-800 rounded text-xs font-bold transition-all"
+            >
+              Definir Destino
+            </button>
+          </div>
+
+          <div className="flex-1 mt-2">
             <div className="w-full h-40 bg-gray-800 rounded flex items-center justify-center text-gray-500">
               Trailer (Em breve)
             </div>
