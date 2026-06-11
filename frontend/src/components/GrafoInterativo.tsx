@@ -60,6 +60,12 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
 
   const nodesVisitados = useMemo(() => new Set(caminho.map(String)), [caminho]);
 
+  const ordemVisita = useMemo(() => { // Mapeia o índice exato de cada nó no caminho para calcular o gradiente de cor
+    const map = new Map();
+    caminho.forEach((id, index) => map.set(String(id), index));
+    return map;
+  }, [caminho]);
+
   return (
     <div ref={containerRef} className="relative w-full h-full bg-black rounded-lg overflow-hidden border border-gray-800">
       <ForceGraph2D
@@ -99,7 +105,14 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({ dadosGrafo, caminho =
             return 'rgba(51, 51, 51, 0.1)';
           }
           
-          if (nodesVisitados.has(sourceId) && nodesVisitados.has(targetId)) return 'rgba(255, 0, 0, 0.6)';
+          if (nodesVisitados.has(sourceId) && nodesVisitados.has(targetId)) {
+            const idxSource = ordemVisita.get(sourceId) ?? 0; // Identifica a ordem de visita da origem
+            const idxTarget = ordemVisita.get(targetId) ?? 0; // Identifica a ordem de visita do destino
+            const maxIdx = Math.max(idxSource, idxTarget); // Utiliza o nó descoberto por último para pautar a cor da aresta
+            const totalNos = Math.max(1, caminho.length - 1);
+            const hue = (maxIdx / totalNos) * 240; // Interpola matiz HSL de Vermelho (0) a Azul (240)
+            return `hsla(${hue}, 100%, 50%, 0.6)`; // Retorna a cor gerada com opacidade de 0.6
+          }
           
           return '#333333';
         }}
